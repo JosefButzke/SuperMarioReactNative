@@ -17,9 +17,9 @@ export const Background = styled(Animated.Image)`
   height: 430px;
 `;
 
-export const SuperMario = styled(Animated.Image)`
-  width: 50px;
-  height: 50px;
+export const SuperMario = styled(Animated.View)`
+  width: 35px;
+  height: 70px;
   position: absolute;
   bottom: ${(deviceHeight / 100) * 5}px;
   left: ${(deviceWidth / 100) * 10}px;

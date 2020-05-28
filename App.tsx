@@ -10,6 +10,7 @@
 
 import React from 'react';
 import Game from './src/pages/GameScreen';
+import MarioAnimated from './src/components/MarioAnimated';
 
 const App = () => {
   return <Game />;
