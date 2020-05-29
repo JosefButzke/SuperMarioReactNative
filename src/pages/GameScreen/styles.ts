@@ -9,7 +9,6 @@ export const Container = styled.TouchableOpacity`
 `;
 
 export const Background = styled(Animated.Image)`
-  flex: 1;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -19,8 +18,17 @@ export const Background = styled(Animated.Image)`
 
 export const SuperMario = styled(Animated.View)`
   width: 35px;
-  height: 70px;
+  height: 80px;
+  border: 1px solid red;
   position: absolute;
   bottom: ${(deviceHeight / 100) * 5}px;
   left: ${(deviceWidth / 100) * 10}px;
+`;
+
+export const Block = styled(Animated.View)`
+  width: 40px;
+  height: 10px;
+  background: red;
+  position: absolute;
+  bottom: 33px;
 `;

@@ -1,51 +1,48 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Animated, Easing, Dimensions, View } from 'react-native';
-import MarioAnimated from '../../components/MarioAnimated';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing } from 'react-native';
 import background from '../../assets/stage.png';
-import { Background, Container, SuperMario } from './styles';
-const deviceWidth = Dimensions.get('screen').width;
+import Mario from '../../components/Mario';
+import { Background, Container, SuperMario, Block } from './styles';
 
 const GameScreen = () => {
+  const marioRef = useRef(null);
   const position = new Animated.ValueXY({ x: 0, y: 0 });
   const [fim, setFim] = useState(true);
 
   const blocks = [
-    { xmedium: -400 + (deviceWidth / 100) * 10 },
-    { xmedium: -580 + (deviceWidth / 100) * 10 },
-    { xmedium: -1000 + (deviceWidth / 100) * 10 },
+    { xmin: -350, xmax: -400 },
+    { xmin: -565, xmax: -615 },
   ];
+  const floorAbove = [{ xmin: -390, xmax: -1200 }];
 
   //x = 382
   //y = 350
 
-  // useEffect(() => {
-  //   console.log(position);
-  // }, [position]);
-
   position.addListener((mario) => {
     const find = blocks.find(
-      (block) =>
-        block.xmedium <= mario.x + 40 &&
-        block.xmedium >= mario.x - 40 &&
-        mario.y >= 0,
+      (block) => block.xmin > mario.x && mario.x > block.xmax && mario.y >= 0,
     );
-
+    console.log(mario);
     if (find) {
       setFim(true);
     }
   });
 
   useEffect(() => {
-    !fim &&
+    if (!fim) {
       Animated.timing(position.x, {
         toValue: -4780,
-        duration: 30000,
+        duration: 90000,
         easing: Easing.linear,
         useNativeDriver: true,
       }).start();
+    } else {
+      marioRef.current.idle();
+    }
   }, [fim, position.x]);
 
-  const handleJump = useCallback(() => {
+  const handleJump = () => {
+    marioRef.current.jump();
     Animated.sequence([
       Animated.timing(position.y, {
         useNativeDriver: true,
@@ -58,10 +55,16 @@ const GameScreen = () => {
         duration: 500,
       }),
     ]).start();
+
+    setTimeout(() => {
+      marioRef.current.walk();
+    }, 600);
+
     if (fim) {
+      marioRef.current.walk();
       setFim(false);
     }
-  }, [position.y, fim]);
+  };
 
   return (
     <Container onPress={handleJump} activeOpacity={1}>
@@ -69,11 +72,26 @@ const GameScreen = () => {
         source={background}
         style={{ transform: [{ translateX: position.x }] }}
       />
+      <Block
+        style={{
+          transform: [{ translateX: position.x }],
+          left: 385, // { xmin: -355, xmax: -400 },
+          width: 90,
+        }}
+      />
+      <Block
+        style={{
+          transform: [{ translateX: position.x }],
+          left: 545,
+          width: 70,
+        }}
+      />
+
       <SuperMario
         style={{
           transform: [{ translateY: position.y }],
         }}>
-        <MarioAnimated />
+        <Mario ref={marioRef} />
       </SuperMario>
     </Container>
   );
