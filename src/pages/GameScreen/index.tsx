@@ -14,7 +14,7 @@ const GameScreen = () => {
   const [fim, setFim] = useState(true);
   const [win, setWin] = useState(false);
 
-  const [bottom, setBottom] = useState(44);
+  const [bottom, setBottom] = useState(0);
 
   const blocks = [
     { xmin: -387, xmax: -475 },
@@ -22,43 +22,48 @@ const GameScreen = () => {
   ];
   const floorAbove = [{ xmin: -976, xmax: -1330 }];
 
-  position.addListener((mario) => {
+  setInterval(() => {
+    const x = position.x._value;
+    const y = position.y._value;
     const find = blocks.find(
       (block) =>
-        block.xmin + deviceWidthOffset > mario.x &&
-        mario.x > block.xmax + deviceWidthOffset + 35 &&
-        mario.y >= 0,
+        block.xmin + deviceWidthOffset > x &&
+        x > block.xmax + deviceWidthOffset + 35 &&
+        y >= 0,
     );
 
     const findUpFloor = floorAbove.find(
       (floor) =>
-        floor.xmin + deviceWidthOffset > mario.x &&
-        mario.x > floor.xmax + deviceWidthOffset + 35 &&
-        mario.y < -44,
+        floor.xmin + deviceWidthOffset + 110 >= x &&
+        x >= floor.xmax + deviceWidthOffset &&
+        y <= -44,
     );
 
-    const outsideFindUpFloor = floorAbove.find(
+    const outsideUpFloor = floorAbove.find(
       (floor) =>
-        floor.xmin + deviceWidthOffset > mario.x &&
-        mario.x > floor.xmax + deviceWidthOffset,
+        floor.xmin + deviceWidthOffset >= x &&
+        x <= floor.xmax + deviceWidthOffset &&
+        bottom === 44,
     );
 
-    if (mario.x <= -1400) {
+    if (findUpFloor) {
+      setBottom(44);
+    }
+
+    if (outsideUpFloor) {
+      setBottom(0);
+    }
+
+    if (x <= -1400) {
       setWin(true);
     }
 
     if (find) {
       setFim(true);
     }
+  }, 20);
 
-    if (findUpFloor) {
-      setBottom(88);
-    }
-
-    if (!outsideFindUpFloor && bottom === 88) {
-      setBottom(44);
-    }
-  });
+  position.addListener(() => { });
 
   useEffect(() => {
     if (win) {
@@ -114,7 +119,7 @@ const GameScreen = () => {
     Animated.sequence([
       Animated.timing(position.y, {
         useNativeDriver: true,
-        toValue: -150,
+        toValue: -150 + bottom,
         duration: 300,
       }),
       Animated.timing(position.y, {
@@ -155,12 +160,12 @@ const GameScreen = () => {
             width: Math.abs(block.xmin - block.xmax),
           }}
         />
-      ))}
-
+      ))} */}
+      {/*
       <Block
         style={{
           transform: [{ translateX: position.x }],
-          left: Math.abs(floorAbove[0].xmin),
+          left: Math.abs(floorAbove[0].xmin + 110),
           width: Math.abs(floorAbove[0].xmin - floorAbove[0].xmax),
           bottom: 88,
         }}
@@ -169,7 +174,7 @@ const GameScreen = () => {
       <SuperMario
         style={{
           transform: [{ translateY: position.y }],
-          bottom: bottom,
+          bottom: 44 + bottom,
         }}>
         <Mario ref={marioRef} />
       </SuperMario>
